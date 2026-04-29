@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Eyaha</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0A0A;color:white;font-family:'DM Sans',sans-serif;min-height:100vh}
+.app{position:relative;overflow:hidden;min-height:100vh}
+.glow{position:fixed;top:-40%;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(255,224,68,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+.container{position:relative;z-index:1;max-width:580px;margin:0 auto;padding:24px 20px 60px;min-height:100vh;display:flex;flex-direction:column}
+nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:48px}
+.logo{font-family:'DM Serif Display',serif;font-size:1.5rem;letter-spacing:-0.02em;color:white;cursor:pointer}
+.logo span{color:#FFE044}
+.nav-links{display:flex;gap:20px}
+.nav-link{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;transition:color 0.2s}
+.nav-link:hover{color:rgba(255,255,255,0.7)}
+.badge{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#FFE044;border:1px solid rgba(255,224,68,0.3);border-radius:4px;padding:4px 10px;display:inline-block;margin-bottom:20px}
+.question{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,4.5vw,2.1rem);line-height:1.25;letter-spacing:-0.02em;margin-bottom:40px;color:white}
+.vote-btn{width:100%;padding:20px 24px;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:12px;margin-bottom:0}
+.btn-a{background:transparent;border:2px solid rgba(255,255,255,0.15);color:white}
+.btn-a:hover{background:#FFE044;border-color:#FFE044;color:#0A0A0A}
+.btn-b{background:transparent;border:2px solid rgba(255,255,255,0.15);color:white}
+.btn-b:hover{background:white;border-color:white;color:#0A0A0A}
+.btn-label{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;min-width:16px}
+.divider{text-align:center;color:rgba(255,255,255,0.2);font-size:0.75rem;letter-spacing:0.1em;margin:12px 0}
+.meta{margin-top:32px;display:flex;justify-content:space-between;align-items:flex-start;border-top:1px solid rgba(255,255,255,0.06);padding-top:20px;gap:16px;flex-wrap:wrap}
+.meta-text{font-size:0.75rem;color:rgba(255,255,255,0.3)}
+.countdown-wrap{display:flex;gap:6px;align-items:center}
+.countdown-block{text-align:center}
+.countdown-num{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:#FFE044;background:rgba(255,224,68,0.08);border:1px solid rgba(255,224,68,0.2);border-radius:6px;padding:4px 10px;min-width:48px;display:inline-block;line-height:1.2}
+.countdown-label{font-size:0.55rem;color:rgba(255,255,255,0.3);margin-top:3px;letter-spacing:0.12em;text-align:center}
+.pulse{width:6px;height:6px;border-radius:50%;background:#4ADE80;display:inline-block;animation:pulse 2s infinite;margin-right:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+/* Demo screen */
+.section-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:12px}
+.chip-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.chip{padding:10px 18px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);color:white;transition:all 0.15s}
+.chip:hover{border-color:rgba(255,255,255,0.3)}
+.chip.active{background:#FFE044;border-color:#FFE044;color:#0A0A0A}
+.primary-btn{width:100%;padding:18px;background:#FFE044;border:none;border-radius:12px;color:#0A0A0A;font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.primary-btn:hover{background:#ffd900}
+.skip-btn{width:100%;margin-top:12px;padding:14px;background:none;border:none;color:rgba(255,255,255,0.25);font-size:0.8rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+.skip-btn:hover{color:rgba(255,255,255,0.5)}
+/* Results */
+.result-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px;margin-bottom:20px}
+.split-wrap{display:flex;gap:14px;margin-bottom:14px}
+.split-item{flex:1;text-align:center;padding:18px 10px;background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.07);border-radius:12px}
+.split-item.chosen{background:rgba(255,224,68,0.08);border-color:rgba(255,224,68,0.4)}
+.split-pct{font-family:'DM Serif Display',serif;font-size:2.8rem;line-height:1;color:white;margin-bottom:6px}
+.split-item.chosen .split-pct{color:#FFE044}
+.split-lbl{font-size:0.78rem;color:rgba(255,255,255,0.5);font-weight:500}
+.your-pick{font-size:0.63rem;color:#FFE044;margin-top:4px;letter-spacing:0.08em}
+.votes-note{font-size:0.7rem;color:rgba(255,255,255,0.2);text-align:center;font-family:'DM Mono',monospace}
+.tabs{display:flex;gap:4px;margin-bottom:18px;background:rgba(255,255,255,0.04);border-radius:10px;padding:4px}
+.tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.35);font-size:0.75rem;font-weight:600;cursor:pointer;text-transform:capitalize;letter-spacing:0.03em;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.tab.active{background:rgba(255,255,255,0.1);color:white}
+.breakdown-panel{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;margin-bottom:16px}
+.breakdown-row{margin-bottom:16px}
+.breakdown-row:last-child{margin-bottom:0}
+.breakdown-meta{display:flex;justify-content:space-between;margin-bottom:6px}
+.breakdown-name{font-size:0.82rem;color:rgba(255,255,255,0.7)}
+.breakdown-nums{font-size:0.72rem;color:rgba(255,255,255,0.3);font-family:'DM Mono',monospace}
+.bar-track{height:8px;border-radius:4px;background:rgba(255,255,255,0.07);overflow:hidden;display:flex}
+.bar-a{background:#FFE044;height:100%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.bar-b{background:rgba(255,255,255,0.18);height:100%}
+.next-box{padding:20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;text-align:center;margin-bottom:14px}
+.next-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:14px}
+.share-btn{width:100%;padding:16px;background:rgba(255,224,68,0.08);border:1.5px solid rgba(255,224,68,0.25);border-radius:12px;color:#FFE044;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.share-btn:hover{background:rgba(255,224,68,0.15)}
+/* Archive */
+.archive-item{margin-bottom:14px;padding:20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px}
+.archive-q{font-size:0.88rem;color:rgba(255,255,255,0.8);line-height:1.55;margin-bottom:14px}
+.archive-votes{font-size:0.68rem;color:rgba(255,255,255,0.2);font-family:'DM Mono',monospace;margin-top:8px}
+.back-btn{width:100%;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:rgba(255,255,255,0.45);font-size:0.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px}
+.screen{display:none;flex:1;flex-direction:column}
+.screen.active{display:flex}
+.copied-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#FFE044;color:#0A0A0A;padding:10px 22px;border-radius:8px;font-size:0.82rem;font-weight:700;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+.copied-toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow"></div>
+  <div class="container">
+
+    <!-- NAV -->
+    <nav>
+      <div class="logo" onclick="showScreen('vote')">ey<span>aha</span></div>
+      <div class="nav-links">
+        <button class="nav-link" onclick="showScreen('archive')">Archive</button>
+        <button class="nav-link" onclick="showScreen('submit')">Submit</button>
+      </div>
+    </nav>
+
+    <!-- VOTE SCREEN -->
+    <div id="screen-vote" class="screen active">
+      <div class="badge">Today's Question · Apr 21</div>
+      <h1 class="question">Your best friend's partner is cheating on them. Your friend has no idea. Do you tell them?</h1>
+      <button class="vote-btn btn-a" onclick="vote('a')">
+        <span class="btn-label">A</span>Tell them
+      </button>
+      <div class="divider">or</div>
+      <button class="vote-btn btn-b" onclick="vote('b')">
+        <span class="btn-label">B</span>Stay out of it
+      </button>
+      <div class="meta">
+        <span class="meta-text">48,291 votes so far</span>
+        <div style="text-align:right">
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px">
+            <span class="pulse"></span>
+            <span class="meta-text">Live — resets in</span>
+          </div>
+          <div class="countdown-wrap" id="countdown-vote"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMO SCREEN -->
+    <div id="screen-demo" class="screen">
+      <div class="badge">One last thing (optional)</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:8px;letter-spacing:-0.02em">Help us show better breakdowns</h2>
+      <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin-bottom:32px;line-height:1.6">Two quick taps — makes the results way more interesting.</p>
+
+      <div class="section-label">Your age</div>
+      <div class="chip-group" id="age-chips">
+        <button class="chip" onclick="selectChip(this,'age')">18–24</button>
+        <button class="chip" onclick="selectChip(this,'age')">25–34</button>
+        <button class="chip" onclick="selectChip(this,'age')">35–50</button>
+        <button class="chip" onclick="selectChip(this,'age')">50+</button>
+      </div>
+
+      <div class="section-label">Gender</div>
+      <div class="chip-group" id="gender-chips">
+        <button class="chip" onclick="selectChip(this,'gender')">Man</button>
+        <button class="chip" onclick="selectChip(this,'gender')">Woman</button>
+        <button class="chip" onclick="selectChip(this,'gender')">Non-binary</button>
+        <button class="chip" onclick="selectChip(this,'gender')">Prefer not to say</button>
+      </div>
+
+      <button class="primary-btn" onclick="showResults()">See the world's verdict →</button>
+      <button class="skip-btn" onclick="showResults()">Skip — just show me results</button>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="screen-results" class="screen">
+      <div class="badge">The World's Verdict</div>
+
+      <div class="result-card">
+        <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-bottom:16px;line-height:1.5">
+          Your best friend's partner is cheating on them. Do you tell them?
+        </p>
+        <div class="split-wrap">
+          <div class="split-item" id="result-a">
+            <div class="split-pct">71%</div>
+            <div class="split-lbl">Tell them</div>
+          </div>
+          <div class="split-item" id="result-b">
+            <div class="split-pct">29%</div>
+            <div class="split-lbl">Stay out of it</div>
+          </div>
+        </div>
+        <div class="votes-note">Based on 48,292 votes worldwide</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('countries',this)">Countries</button>
+        <button class="tab" onclick="switchTab('age',this)">Age</button>
+        <button class="tab" onclick="switchTab('gender',this)">Gender</button>
+      </div>
+
+      <div id="tab-countries" class="breakdown-panel">
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">🇺🇸 USA</span><span class="breakdown-nums">78% / 22%</span></div><div class="bar-track"><div class="bar-a" style="width:78%"></div><div class="bar-b" style="width:22%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">🇧🇷 Brazil</span><span class="breakdown-nums">83% / 17%</span></div><div class="bar-track"><div class="bar-a" style="width:83%"></div><div class="bar-b" style="width:17%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">🇩🇪 Germany</span><span class="breakdown-nums">69% / 31%</span></div><div class="bar-track"><div class="bar-a" style="width:69%"></div><div class="bar-b" style="width:31%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">🇫🇷 France</span><span class="breakdown-nums">52% / 48%</span></div><div class="bar-track"><div class="bar-a" style="width:52%"></div><div class="bar-b" style="width:48%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">🇱🇧 Lebanon</span><span class="breakdown-nums">44% / 56%</span></div><div class="bar-track"><div class="bar-a" style="width:44%"></div><div class="bar-b" style="width:56%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">🇯🇵 Japan</span><span class="breakdown-nums">38% / 62%</span></div><div class="bar-track"><div class="bar-a" style="width:38%"></div><div class="bar-b" style="width:62%"></div></div></div>
+      </div>
+
+      <div id="tab-age" class="breakdown-panel" style="display:none">
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">18–24</span><span class="breakdown-nums">65% tell · 35% stay out</span></div><div class="bar-track"><div class="bar-a" style="width:65%"></div><div class="bar-b" style="width:35%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">25–34</span><span class="breakdown-nums">72% tell · 28% stay out</span></div><div class="bar-track"><div class="bar-a" style="width:72%"></div><div class="bar-b" style="width:28%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">35–50</span><span class="breakdown-nums">74% tell · 26% stay out</span></div><div class="bar-track"><div class="bar-a" style="width:74%"></div><div class="bar-b" style="width:26%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">50+</span><span class="breakdown-nums">68% tell · 32% stay out</span></div><div class="bar-track"><div class="bar-a" style="width:68%"></div><div class="bar-b" style="width:32%"></div></div></div>
+      </div>
+
+      <div id="tab-gender" class="breakdown-panel" style="display:none">
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">Men</span><span class="breakdown-nums">63% tell · 37% stay out</span></div><div class="bar-track"><div class="bar-a" style="width:63%"></div><div class="bar-b" style="width:37%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">Women</span><span class="breakdown-nums">79% tell · 21% stay out</span></div><div class="bar-track"><div class="bar-a" style="width:79%"></div><div class="bar-b" style="width:21%"></div></div></div>
+      </div>
+
+      <div class="next-box">
+        <div class="next-label">Next question in</div>
+        <div class="countdown-wrap" id="countdown-results" style="justify-content:center"></div>
+      </div>
+
+      <button class="share-btn" onclick="shareVerdict()">Share your verdict ↗</button>
+    </div>
+
+    <!-- ARCHIVE SCREEN -->
+    <div id="screen-archive" class="screen">
+      <div class="badge">Past Questions</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;margin-bottom:6px;letter-spacing:-0.02em">The Archive</h2>
+      <p style="color:rgba(255,255,255,0.3);font-size:0.82rem;margin-bottom:28px">Every question. Forever.</p>
+
+      <div class="archive-item">
+        <p class="archive-q">You find $500 cash on the street. Do you keep it?</p>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name" style="color:#FFE044">Keep it</span><span class="breakdown-nums">58%</span></div><div class="bar-track"><div class="bar-a" style="width:58%"></div><div class="bar-b" style="width:42%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">Turn it in</span><span class="breakdown-nums">42%</span></div></div>
+        <div class="archive-votes">91,204 votes</div>
+      </div>
+
+      <div class="archive-item">
+        <p class="archive-q">Would you take a job you hate for triple your current salary?</p>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name" style="color:#FFE044">Yes</span><span class="breakdown-nums">61%</span></div><div class="bar-track"><div class="bar-a" style="width:61%"></div><div class="bar-b" style="width:39%"></div></div></div>
+        <div class="archive-votes">73,819 votes</div>
+      </div>
+
+      <div class="archive-item">
+        <p class="archive-q">Should parents read their teenager's private messages?</p>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name">Yes, for safety</span><span class="breakdown-nums">34%</span></div><div class="bar-track"><div class="bar-a" style="width:34%"></div><div class="bar-b" style="width:66%"></div></div></div>
+        <div class="breakdown-row"><div class="breakdown-meta"><span class="breakdown-name" style="color:#FFE044">No, respect privacy</span><span class="breakdown-nums">66%</span></div></div>
+        <div class="archive-votes">82,047 votes</div>
+      </div>
+
+      <button class="back-btn" onclick="showScreen('vote')">← Back to today's question</button>
+    </div>
+
+    <!-- SUBMIT SCREEN -->
+    <div id="screen-submit" class="screen">
+      <div class="badge">Community Submissions</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;margin-bottom:8px;letter-spacing:-0.02em">Ask the world your question</h2>
+      <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin-bottom:32px;line-height:1.65">Have a real dilemma you want the world to weigh in on? Submit it. We review every submission and if it makes the cut, it goes live to our global audience. You'll get the full results breakdown when it does.</p>
+
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:20px">
+        <div class="section-label" style="margin-bottom:14px">What makes a good question</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;font-size:0.82rem;color:rgba(255,255,255,0.6)"><span style="color:#FFE044">✓</span>Real and personal — something you've actually faced</div>
+          <div style="display:flex;gap:10px;font-size:0.82rem;color:rgba(255,255,255,0.6)"><span style="color:#FFE044">✓</span>Two clear sides — no obvious right answer</div>
+          <div style="display:flex;gap:10px;font-size:0.82rem;color:rgba(255,255,255,0.6)"><span style="color:#FFE044">✓</span>Universally relatable — anyone anywhere can answer</div>
+          <div style="display:flex;gap:10px;font-size:0.82rem;color:rgba(255,255,255,0.55)"><span style="color:rgba(255,100,100,0.7)">✗</span>Not political parties, religion, or hate</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,224,68,0.06);border:1.5px solid rgba(255,224,68,0.2);border-radius:12px;padding:24px;text-align:center">
+        <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:#FFE044;margin-bottom:6px">$9</div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5">One-time fee. Full refund if we don't approve it.<br/>Includes a private results report when it goes live.</div>
+        <button class="primary-btn" style="max-width:240px;margin:0 auto;display:block">Submit your question</button>
+      </div>
+
+      <button class="back-btn" onclick="showScreen('vote')">← Back to today's question</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="copied-toast" id="toast">Copied to clipboard ✓</div>
+
+<script>
+let userChoice = null;
+
+function pad(n){return String(n).padStart(2,'0')}
+
+function getCountdown(){
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(24,0,0,0);
+  const diff = Math.floor((midnight-now)/1000);
+  return{h:Math.floor(diff/3600),m:Math.floor((diff%3600)/60),s:diff%60};
+}
+
+function renderCountdown(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const{h,m,s} = getCountdown();
+  el.innerHTML = [['H',h],['M',m],['S',s]].map(([l,v])=>`
+    <div class="countdown-block">
+      <div class="countdown-num">${pad(v)}</div>
+      <div class="countdown-label">${l}</div>
+    </div>
+  `).join('');
+}
+
+setInterval(()=>{
+  renderCountdown('countdown-vote');
+  renderCountdown('countdown-results');
+},1000);
+renderCountdown('countdown-vote');
+renderCountdown('countdown-results');
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+
+const SUPABASE_URL = 'https://ylcipdqbcjhrrnncvkvz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_88Yiwsk9VW0LSwkYqGrUig_LXsFtagF';
+
+async function vote(choice){
+  userChoice = choice;
+
+  // Detect country
+  let country = 'Unknown';
+  try {
+    const geo = await fetch('https://ipapi.co/json/');
+    const geoData = await geo.json();
+    country = geoData.country_name || 'Unknown';
+  } catch(e) { console.log('geo error', e); }
+
+  // Save to Supabase
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/votes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        question_id: 1,
+        choice: choice,
+        country: country
+      })
+    });
+    console.log('Vote saved! Status:', res.status, '| Country:', country);
+  } catch(e) {
+    console.log('Vote error:', e);
+  }
+
+  // Highlight chosen result
+  const a = document.getElementById('result-a');
+  const b = document.getElementById('result-b');
+  if(choice==='a'){
+    a.classList.add('chosen');
+    a.innerHTML += '<div class=\"your-pick\">your pick</div>';
+  } else {
+    b.classList.add('chosen');
+    b.innerHTML += '<div class=\"your-pick\">your pick</div>';
+  }
+  showScreen('demo');
+}
+
+function selectChip(el, group){
+  document.querySelectorAll(`#${group}-chips .chip`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showResults(){
+  showScreen('results');
+}
+
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['countries','age','gender'].forEach(t=>{
+    const el = document.getElementById('tab-'+t);
+    el.style.display = t===tab ? 'block' : 'none';
+  });
+}
+
+function shareVerdict(){
+  const choice = userChoice==='a' ? 'Tell them' : 'Stay out of it';
+  const pct = userChoice==='a' ? 71 : 29;
+  const lbPct = userChoice==='a' ? 44 : 56;
+  const text = `I said "${choice}" — so did ${pct}% of the world.\nBut only ${lbPct}% in Lebanon agreed 🇱🇧\n\neyaha — one question. every day.\neyaha.com`;
+  if(navigator.share){
+    navigator.share({text});
+  } else {
+    navigator.clipboard?.writeText(text).then(()=>{
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),2200);
+    });
+  }
+}
+</script>
+</body>
+</html>
