@@ -349,7 +349,41 @@ function selectChip(el, group){
   el.classList.add('active');
 }
 
-function showResults(){
+async function showResults(){
+  // Get selected age and gender
+  const ageEl = document.querySelector('#age-chips .chip.active');
+  const genderEl = document.querySelector('#gender-chips .chip.active');
+  const age = ageEl ? ageEl.textContent : null;
+  const gender = genderEl ? genderEl.textContent : null;
+
+  // Update the last vote with age and gender
+  if(age || gender) {
+    try {
+      // Get the latest vote id
+      const res = await fetch(SUPABASE_URL + '/rest/v1/votes?order=id.desc&limit=1', {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
+        }
+      });
+      const votes = await res.json();
+      if(votes && votes.length > 0) {
+        const latestId = votes[0].id;
+        await fetch(SUPABASE_URL + '/rest/v1/votes?id=eq.' + latestId, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY
+          },
+          body: JSON.stringify({ age_group: age, gender: gender })
+        });
+        console.log('Age/gender saved:', age, gender);
+      }
+    } catch(e) {
+      console.log('Age/gender error:', e);
+    }
+  }
   showScreen('results');
 }
 
